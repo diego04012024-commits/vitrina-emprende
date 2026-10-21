@@ -1,0 +1,37 @@
+rules_version = '2';
+// Reglas de seguridad de Cloud Firestore para Vitrina Emprende.
+// Pégalas en Firebase Console › Firestore Database › Reglas › Publicar.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Perfil del vendedor: solo él puede leerlo y escribirlo
+    match /usuarios/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Productos: cualquiera puede verlos; solo el dueño los crea, edita o retira
+    match /productos/{id} {
+      allow read: if true;
+
+      allow create: if request.auth != null
+        && request.resource.data.vendedorId == request.auth.uid
+        && fichaValida(request.resource.data);
+
+      allow update: if request.auth != null
+        && resource.data.vendedorId == request.auth.uid
+        && request.resource.data.vendedorId == resource.data.vendedorId
+        && fichaValida(request.resource.data);
+
+      allow delete: if request.auth != null && resource.data.vendedorId == request.auth.uid;
+    }
+
+    // Ficha completa (Objetivo 2): foto, nombre, descripción, precio y categoría
+    function fichaValida(d) {
+      return d.nombre is string && d.nombre.size() >= 3 && d.nombre.size() <= 60
+        && d.descripcion is string && d.descripcion.size() >= 20 && d.descripcion.size() <= 300
+        && d.precio is number && d.precio > 0
+        && d.categoria in ['comida', 'accesorios', 'ropa', 'arte', 'manualidades', 'otros']
+        && d.foto is string && d.foto.size() > 0;
+    }
+  }
+}

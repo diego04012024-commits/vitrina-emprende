@@ -1,0 +1,17 @@
+{
+  "name": "vitrina-emprende",
+  "version": "1.0.0",
+  "description": "Plataforma web para la difusión y venta de productos elaborados por estudiantes de Cibertec",
+  "private": true,
+  "scripts": {
+    "start": "http-server . -p 5500 -c-1",
+    "test": "playwright test",
+    "test:integracion": "playwright test tests/integracion.spec.js",
+    "test:rendimiento": "playwright test tests/rendimiento.spec.js",
+    "reporte": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.0",
+    "http-server": "14.1.1"
+  }
+}
